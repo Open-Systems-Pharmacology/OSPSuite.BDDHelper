@@ -37,4 +37,4 @@ skip_commits:
 notifications:
   - provider: Slack
     incoming_webhook:      
-      secure: k69VtYiR3bK9K+14+bKBTYQ/9tADQMnSUW/YlY8zV2ZChCGKlyezIq909Jh86+suMLR/ZCKWtfCO/mSArsXmYpmJqmg3Utuw73bA3c1hKw8=    
+      secure: 4MH9Em6TtrKalq6808dhPOqypTfYBJvVlqPaa9akNyF1h7st5qNdNezFp6T+bWXqrcZ4q/smtPcJ7LkUFHL46JDYUFlIL8FDz+ApX/vP+x0=    
