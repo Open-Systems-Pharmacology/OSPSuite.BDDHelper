@@ -50,6 +50,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ContextSpecification.cs" />
+    <Compile Include="ContextSpecificationAsync.cs" />
     <Compile Include="Extensions\BDDExtensions.cs" />
     <Compile Include="IntegrationTestsAttribute.cs" />
     <Compile Include="ObservationAttribute.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using OSPSuite.BDDHelper.Extensions;
 
@@ -29,6 +30,32 @@ namespace OSPSuite.BDDHelper
       }
    }
 
+   public class When_testing_numerical_relations_within_arrays : concern_for_BDDExtensions
+   {
+      private double[] _array1;
+      private float[] _array1Float;
+      private double[] _array2;
+      private float[] _array2Float;
+
+      protected override void Context()
+      {
+         base.Context();
+         _array1 = new[] {0.553, 0.61};
+         _array1Float = new[] { 0.553f, 0.61f };
+         _array2 = new[] {0.55, 0.612};
+         _array2Float = new[] {0.55f, 0.612f};
+
+      }
+      [Test]
+      public void should_return_the_expected_values()
+      {
+         _array1.ShouldBeEqualTo(_array1);
+         _array1.ShouldBeEqualTo(_array2, 1e-2);
+         _array1Float.ShouldBeEqualTo(_array1Float);
+         _array1Float.ShouldBeEqualTo(_array2Float, 1e-2);
+      }
+   }
+
    public class When_testing_boolean_relations : concern_for_BDDExtensions
    {
       [Observation]
@@ -41,19 +68,31 @@ namespace OSPSuite.BDDHelper
 
    public class When_testing_instances_relations : concern_for_BDDExtensions
    {
-      private Parameter _parmaeter;
+      private Parameter _parameter;
 
       protected override void Context()
       {
          base.Context();
-         _parmaeter = new Parameter();
+         _parameter = new Parameter();
       }
 
       [Observation]
       public void should_return_the_execpted_values()
       {
-         _parmaeter.ShouldBeAnInstanceOf<Parameter>();
-         _parmaeter.ShouldBeAnInstanceOf(typeof(Parameter));
+         _parameter.ShouldBeAnInstanceOf<Parameter>();
+         _parameter.ShouldBeAnInstanceOf(typeof(Parameter));
+      }
+   }
+
+   public class When_testing_string_null_or_empty : concern_for_BDDExtensions
+   {
+      private readonly string _string=null;
+
+      [Observation]
+      public void should_return_the_execpted_values()
+      {
+         _string.ShouldBeNullOrEmpty();
+         "".ShouldBeNullOrEmpty();
       }
    }
 
@@ -128,6 +167,21 @@ namespace OSPSuite.BDDHelper
       public void should_return_the_expected_values()
       {
          The.Action(() => _parameter.Name = "Toto").ShouldThrowAn<NullReferenceException>();
+      }
+   }
+
+   public class When_testing_async_exception_being_thrown : concern_for_BDDExtensions
+   {
+      private readonly Parameter _parameter = null;
+
+      [Observation]
+      public void should_return_the_expected_values()
+      {
+         The.Action(async ()=>
+         {
+            await Task.Delay(100);
+            _parameter.Name = "Toto";
+         }).ShouldThrowAn<NullReferenceException>();
       }
    }
 }

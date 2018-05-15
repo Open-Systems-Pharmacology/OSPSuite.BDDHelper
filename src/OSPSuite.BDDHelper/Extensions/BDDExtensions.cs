@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace OSPSuite.BDDHelper.Extensions
@@ -15,6 +16,14 @@ namespace OSPSuite.BDDHelper.Extensions
       ///    Returns the action given as parameter to enable a syntax such as The.Action(xx).ShouldTrowAn...
       /// </summary>
       public static Action Action(Action action)
+      {
+         return action;
+      }
+
+      /// <summary>
+      ///    Returns the action given as parameter to enable a syntax such as The.Action(xx).ShouldTrowAn...
+      /// </summary>
+      public static Func<Task> Action(Func<Task> action)
       {
          return action;
       }
@@ -137,7 +146,7 @@ namespace OSPSuite.BDDHelper.Extensions
       public static void ShouldOnlyContainInOrder<T>(this IEnumerable<T> items, params T[] itemsToFind)
       {
          var results = new List<T>(items);
-         results.Count.ShouldBeEqualTo(itemsToFind.Length);
+         results.ShouldHaveSameLengthAs(itemsToFind);
          for (var i = 0; i < itemsToFind.Count(); i++)
          {
             results[i].ShouldBeEqualTo(itemsToFind[i]);
@@ -145,99 +154,101 @@ namespace OSPSuite.BDDHelper.Extensions
       }
 
       /// <summary>
-      ///    Asserts that <paramref name="item" /> is true.
+      ///    Asserts that <paramref name="item" /> is true and logs the <paramref name="message" /> otherwise if defined
       /// </summary>
-      public static void ShouldBeTrue(this bool item)
-      {
-         item.ShouldBeEqualTo(true);
-      }
-
-      /// <summary>
-      ///    Asserts that <paramref name="item" /> is false.
-      /// </summary>
-      public static void ShouldBeFalse(this bool item)
-      {
-         item.ShouldBeEqualTo(false);
-      }
-
-      /// <summary>
-      ///    Asserts that <paramref name="item" /> is true and log the <paramref name="message" /> otherwise
-      /// </summary>
-      public static void ShouldBeTrue(this bool item, string message)
+      public static void ShouldBeTrue(this bool item, string message = null)
       {
          item.ShouldBeEqualTo(true, message);
       }
 
       /// <summary>
-      ///    Asserts that <paramref name="item" /> is false and log the <paramref name="message" /> otherwise
+      ///    Asserts that <paramref name="item" /> is false and logs the <paramref name="message" /> otherwise if defined
       /// </summary>
-      public static void ShouldBeFalse(this bool item, string message)
+      public static void ShouldBeFalse(this bool item, string message = null)
       {
          item.ShouldBeEqualTo(false, message);
       }
 
       /// <summary>
       ///    Asserts that <paramref name="actual" /> is equal to <paramref name="expected" /> using the object.Equals comparer.
+      ///    Logs the <paramref name="message" /> if not equal and if defined
       /// </summary>
-      public static void ShouldBeEqualTo<T>(this T actual, T expected)
-      {
-         actual.ShouldBeEqualTo(expected, string.Empty);
-      }
-
-      /// <summary>
-      ///    Asserts that the double <paramref name="actual" /> is equal to the double <paramref name="expected" /> within th
-      ///    given relative tolerance.
-      /// </summary>
-      public static void ShouldBeEqualTo(this double actual, double expected, double relTol)
-      {
-         actual.ShouldBeEqualTo(expected, relTol, string.Empty);
-      }
-
-      /// <summary>
-      ///    Asserts that the double <paramref name="actual" /> is equal to the double <paramref name="expected" /> within th
-      ///    given relative tolerance.
-      /// </summary>
-      public static void ShouldBeEqualTo(this double actual, double expected, double relTol, string message)
-      {
-         string error = $"{actual} and {expected} are not equal within relative tolerance {relTol}.";
-         if (!string.IsNullOrEmpty(message))
-            error = $"{message}. {error}";
-
-         relativeDeviationWithinTolerance(actual, expected, relTol).ShouldBeTrue(error);
-      }
-
-      /// <summary>
-      ///    Asserts that the float <paramref name="actual" /> is equal to the double <paramref name="expected" /> within th
-      ///    given relative tolerance.
-      /// </summary>
-      public static void ShouldBeEqualTo(this float actual, float expected, double relTol)
-      {
-         actual.ShouldBeEqualTo(expected, relTol, string.Empty);
-      }
-
-      /// <summary>
-      ///    Asserts that the float <paramref name="actual" /> is equal to the float <paramref name="expected" /> within th
-      ///    given relative tolerance.
-      /// </summary>
-      public static void ShouldBeEqualTo(this float actual, float expected, double relTol, string message)
-      {
-         string error = $"{actual} and {expected} are not equal within relative tolerance {relTol}.";
-         if (!string.IsNullOrEmpty(message))
-            error = $"{message}. {error}";
-
-         relativeDeviationWithinTolerance(actual, expected, relTol).ShouldBeTrue(error);
-      }
-
-      /// <summary>
-      ///    Asserts that <paramref name="actual" /> is equal to <paramref name="expected" /> using the object.Equals comparer.
-      ///    Log the <paramref name="message" /> if not.
-      /// </summary>
-      public static void ShouldBeEqualTo<T>(this T actual, T expected, string message)
+      public static void ShouldBeEqualTo<T>(this T actual, T expected, string message = null)
       {
          if (shouldCheckReferences<T>())
             Assert.AreSame(expected, actual, message);
          else
             Assert.AreEqual(expected, actual, message);
+      }
+
+      /// <summary>
+      ///    Asserts that the double array <paramref name="actual" /> is equal to the double array <paramref name="expected" />
+      ///    within the
+      ///    given relative tolerance.
+      /// </summary>
+      public static void ShouldBeEqualTo(this double[] actual, double[] expected, double relTol, string message = null)
+      {
+         actual.ShouldHaveSameLengthAs(expected);
+         for (var i = 0; i < expected.Count(); i++)
+         {
+            actual[i].ShouldBeEqualTo(expected[i], relTol, message);
+         }
+      }
+
+      /// <summary>
+      ///    Asserts that the double <paramref name="actual" /> is equal to the double <paramref name="expected" /> within the
+      ///    given relative tolerance.
+      /// </summary>
+      public static void ShouldBeEqualTo(this double actual, double expected, double relTol, string message = null)
+      {
+         string error = $"{actual} and {expected} are not equal within relative tolerance {relTol}.";
+         if (!string.IsNullOrEmpty(message))
+            error = $"{message}. {error}";
+
+         relativeDeviationWithinTolerance(actual, expected, relTol).ShouldBeTrue(error);
+      }
+
+      /// <summary>
+      ///    Asserts that the float array <paramref name="actual" /> is equal to the float array <paramref name="expected" />
+      ///    within the
+      ///    given relative tolerance.
+      /// </summary>
+      public static void ShouldBeEqualTo(this float[] actual, float[] expected, double relTol, string message = null)
+      {
+         actual.ShouldHaveSameLengthAs(expected);
+         for (var i = 0; i < expected.Count(); i++)
+         {
+            actual[i].ShouldBeEqualTo(expected[i], relTol, message);
+         }
+      }
+
+      /// <summary>
+      ///    Asserts that the float <paramref name="actual" /> is equal to the float <paramref name="expected" /> within the
+      ///    given relative tolerance.
+      /// </summary>
+      public static void ShouldBeEqualTo(this float actual, float expected, double relTol, string message = null)
+      {
+         string error = $"{actual} and {expected} are not equal within relative tolerance {relTol}.";
+         if (!string.IsNullOrEmpty(message))
+            error = $"{message}. {error}";
+
+         relativeDeviationWithinTolerance(actual, expected, relTol).ShouldBeTrue(error);
+      }
+
+      /// <summary>
+      ///    Asserts that the string <paramref name="actual" /> is the null or empty string
+      /// </summary>
+      public static void ShouldBeNullOrEmpty(this string actual, string message = null)
+      {
+         string.IsNullOrEmpty(actual).ShouldBeTrue(message);
+      }
+
+      /// <summary>
+      ///    Asserts that the <paramref name="actual" /> and <paramref name="expected"/> list have the same length
+      /// </summary>
+      public static void ShouldHaveSameLengthAs<T>(this IReadOnlyList<T> actual, IReadOnlyList<T> expected)
+      {
+         actual.Count.ShouldBeEqualTo(expected.Count, $"Length are not equal ({actual.Count} vs {expected.Count})");
       }
 
       private static bool shouldCheckReferences<T>()
@@ -275,18 +286,9 @@ namespace OSPSuite.BDDHelper.Extensions
       /// <summary>
       ///    Asserts that <paramref name="actual" /> is not equal to <paramref name="expected" /> using the object.Equals
       ///    comparer.
+      ///    Logs the <paramref name="message" /> if not and if defined
       /// </summary>
-      public static void ShouldNotBeEqualTo<T>(this T actual, T expected)
-      {
-         actual.ShouldNotBeEqualTo(expected, string.Empty);
-      }
-
-      /// <summary>
-      ///    Asserts that <paramref name="actual" /> is not equal to <paramref name="expected" /> using the object.Equals
-      ///    comparer.
-      ///    Log the <paramref name="message" /> if not.
-      /// </summary>
-      public static void ShouldNotBeEqualTo<T>(this T actual, T expected, string message)
+      public static void ShouldNotBeEqualTo<T>(this T actual, T expected, string message = null)
       {
          if (shouldCheckReferences<T>())
             Assert.AreNotSame(expected, actual, message);
@@ -302,6 +304,25 @@ namespace OSPSuite.BDDHelper.Extensions
          var resultingException = getExceptionFromPerforming(workToPerform);
          resultingException.ShouldNotBeNull();
          resultingException.ShouldBeAnInstanceOf<TException>();
+      }
+
+      /// <summary>
+      ///    Asserts that <paramref name="workToPerform" /> throws an exception when performed.
+      /// </summary>
+      public static void ShouldThrowAn<TException>(this Func<Task> workToPerform) where TException : Exception
+      {
+         try
+         {
+            workToPerform().Wait();
+            true.ShouldBeFalse("Exception not thrown as expected");
+         }
+         catch (TException)
+         {
+         }
+         catch (AggregateException ex)
+         {
+            ex.InnerExceptions.FirstOrDefault(e => e is TException).ShouldNotBeEqualTo(null, $"Exception of type {typeof(TException)} not found");
+         }
       }
 
       /// <summary>
