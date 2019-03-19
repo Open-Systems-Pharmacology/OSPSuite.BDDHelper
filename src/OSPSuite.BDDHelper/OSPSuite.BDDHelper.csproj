@@ -49,12 +49,13 @@
     <Compile Include="..\..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ContextSpecification.cs" />
-    <Compile Include="ContextSpecificationAsync.cs" />
+    <Compile Include="AbstractContextSpecification.cs" />
+    <Compile Include="AbstractContextSpecificationAsync.cs" />
     <Compile Include="Extensions\BDDExtensions.cs" />
     <Compile Include="IntegrationTestsAttribute.cs" />
     <Compile Include="ObservationAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StaticContextSpecification.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
