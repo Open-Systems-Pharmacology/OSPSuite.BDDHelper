@@ -6,21 +6,12 @@ environment:
 
 version: '$(app_version).{build}'
 
-# here we are going to override common configuration
-for:
-
--
-  branches:
-    only:
-      - master
-      - develop
-
-  dotnet_csproj:
-    patch: true
-    file: '**\*.csproj'
-    assembly_version: '$(version)'
-    file_version: '{version}'
-    informational_version: '{version}'
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  assembly_version: '$(version)'
+  file_version: '{version}'
+  informational_version: '{version}'
 
 cache:
   packages -> **\packages.config  # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
