@@ -11,7 +11,7 @@ dotnet_csproj:
   file: '**\*.csproj'
   version: '{version}'
   package_version: '{version}'
-  assembly_version: '{version}'
+  assembly_version: '$(appveyor_build_version)'
   file_version: '{version}'
   informational_version: '{version}'
 
@@ -27,6 +27,7 @@ nuget:
 build:
   publish_nuget: true
   publish_nuget_symbols: true
+  verbosity: minimal
 
 test:
   assemblies:
