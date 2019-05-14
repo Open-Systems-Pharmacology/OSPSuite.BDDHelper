@@ -8,12 +8,12 @@ init:
 environment:
   app_version: '3.1.0'
 
-version: '$(app_version).{build_number}'
+version: '$(app_version).$(build_number)'
 
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  assembly_version: '$(version)'
+  assembly_version: '{version}'
   file_version: '{version}'
   informational_version: '{version}'
 
