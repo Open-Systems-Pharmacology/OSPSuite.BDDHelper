@@ -8,14 +8,14 @@ init:
 environment:
   app_version: '3.1.0'
 
-version: '$(app_version).$(build_number)'
+version: '$(app_version).{build}'
 
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
+  assembly_version: '$(app_version).$(build_number)'
+  file_version: '$(app_version).$(build_number)'
+  informational_version: '$(app_version).$(build_number)'
 
 cache:
   packages -> **\*.csproj  # preserve "packages" directory in the root of build folder but will reset it if a project file is modified
