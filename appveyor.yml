@@ -1,10 +1,14 @@
 image: Visual Studio 2017
 configuration: Debug 
 
+# hack until donet patching works with PR
+init: 
+  - cmd: if DEFINED APPVEYOR_PULL_REQUEST_NUMBER (Set build_number=1) ELSE (Set build_number=%APPVEYOR_BUILD_NUMBER%)
+
 environment:
   app_version: '3.1.0'
 
-version: '$(app_version).{build}'
+version: '$(app_version).{build_number}'
 
 dotnet_csproj:
   patch: true
@@ -12,10 +16,6 @@ dotnet_csproj:
   assembly_version: '$(version)'
   file_version: '{version}'
   informational_version: '{version}'
-
-# hack until donet patching works with PR
-init: 
-  - cmd: if DEFINED APPVEYOR_PULL_REQUEST_NUMBER (Set build_number=1) ELSE (Set build_number=%APPVEYOR_BUILD_NUMBER%)
 
 cache:
   packages -> **\*.csproj  # preserve "packages" directory in the root of build folder but will reset it if a project file is modified
