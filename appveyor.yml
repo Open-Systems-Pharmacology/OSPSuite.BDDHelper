@@ -1,29 +1,34 @@
 image: Visual Studio 2017
 configuration: Debug 
 
+# hack until donet patching works with PR
+init: 
+  - cmd: if DEFINED APPVEYOR_PULL_REQUEST_NUMBER (Set build_number=1) ELSE (Set build_number=%APPVEYOR_BUILD_NUMBER%)
+
 environment:
-  app_version: '3.0.0'
+  app_version: '3.1.0'
 
 version: '$(app_version).{build}'
 
-assembly_info:
+dotnet_csproj:
   patch: true
-  file: SolutionInfo.*
-  assembly_version: "{version}"
-  assembly_file_version: "{version}"	
+  file: '**\*.csproj'
+  assembly_version: '$(app_version).$(build_number)'
+  file_version: '$(app_version).$(build_number)'
+  informational_version: '$(app_version).$(build_number)'
 
 cache:
-  packages -> **\packages.config  # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
+  packages -> **\*.csproj  # preserve "packages" directory in the root of build folder but will reset it if a project file is modified
 
 before_build:
   nuget restore
 
 nuget:
-  account_feed: true
   disable_publish_on_pr: true  
 
 build:
   publish_nuget: true
+  publish_nuget_symbols: true
   verbosity: minimal
 
 test:
@@ -48,5 +53,6 @@ pull_requests:
 
 notifications:
   - provider: Slack
-    incoming_webhook:      
-      secure: 4MH9Em6TtrKalq6808dhPOqypTfYBJvVlqPaa9akNyF1h7st5qNdNezFp6T+bWXqrcZ4q/smtPcJ7LkUFHL46JDYUFlIL8FDz+ApX/vP+x0=    
+    incoming_webhook:
+      secure: 4MH9Em6TtrKalq6808dhPOqypTfYBJvVlqPaa9akNyFEAs8X080yIO8g1FLt3tNfBN4OpeBnkgrXzf7AqNKV5561x7Coux3ByGrHmsL1sCo=
+      
